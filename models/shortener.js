@@ -2,7 +2,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const shortenerSchema = new Schema({
+const urlSchema = new Schema({
   shortenURL: {
     type: String,
     require: true
@@ -13,4 +13,4 @@ const shortenerSchema = new Schema({
   }
 })
 
-module.exports = mongoose.model('Shortener', userSchema)
+module.exports = mongoose.model('Shortener', urlSchema)
