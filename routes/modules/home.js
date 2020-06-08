@@ -35,10 +35,7 @@ router.post('/shortener', (req, res) => {
   } else if (url.includes("https://") || url.includes("http://")) {
     Shortener.findOne({ originalUrl: url })
       .lean()
-      // .exec((err, shortener) => {
-        // if (err) console.log(err)
-        // 資料庫有該網址就回傳短址
-        // Callback改Promise風格
+      // 資料庫有該網址就回傳短址
       .then((shortener) => {
         if (shortener) {
           let link = ''
@@ -58,24 +55,16 @@ router.post('/shortener', (req, res) => {
 
 router.get('/:id', (req, res) => {
   Shortener.findOne({ shortenURL: req.params.id })
-    // .exec((err, shortener) => {
-    //   if (err) console.log(err)
-    //   if (shortener) {
-    //     res.redirect(shortener.originalUrl)
-    //   } else {
-    //     res.render('index')
-    //   }
-    // })
-    // Callback改Promise風格
     .lean()
     .then((shortener) => {
       if (shortener) {
-      return res.redirect(shortener.originalUrl)
-    } else {
-      return res.render('index')}
+        return res.redirect(shortener.originalUrl)
+      } else {
+        return res.render('index')
+      }
     })
     .catch((err) => console.log(err))
-})  
+})
 
 
 module.exports = router
