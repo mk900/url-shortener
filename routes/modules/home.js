@@ -11,23 +11,12 @@ router.post('/shortener', (req, res) => {
   const url = req.body.url
   const createRandomShortener = function () {
     const shortenerCode = Math.random().toString(36).slice(-5)
-    Shortener.findOne({ shortenURL: shortenerCode }, (err, shortener) => {
-      if (err) {
-        console.log(err)
-      } else {
-        const shortener = new Shortener({
-          shortenURL: shortenerCode,
-          originalUrl: url
-        })
-        shortener.save(err => {
-          let link = ''
-          link += req.headers.origin + '/' + shortenerCode
-          if (err) console.log(err)
-          return res.render('shortener', { link })
-        })
-      }
-    })
-  }
+    // console.log(shortenerCode)     
+    let link = ''
+    link += req.headers.origin + '/' + shortenerCode
+    Shortener.create({ originalUrl:url, shortenURL:shortenerCode })
+    res.render('shortener', { link })
+  }  
 
   // 防止表單是空值或輸入不全
   if (url === '') {
@@ -35,7 +24,8 @@ router.post('/shortener', (req, res) => {
   } else if (url.includes("https://") || url.includes("http://")) {
     Shortener.findOne({ originalUrl: url })
       .lean()
-      // 資料庫有該網址就回傳短址
+        // 資料庫有該網址就回傳短址
+        // Callback改Promise風格
       .then((shortener) => {
         if (shortener) {
           let link = ''
@@ -51,20 +41,19 @@ router.post('/shortener', (req, res) => {
   } else {
     res.render('index', { messages: 'URL欄位未完整需含https://' })
   }
-})
+})  
 
 router.get('/:id', (req, res) => {
   Shortener.findOne({ shortenURL: req.params.id })
     .lean()
     .then((shortener) => {
       if (shortener) {
-        return res.redirect(shortener.originalUrl)
-      } else {
-        return res.render('index')
-      }
+      return res.redirect(shortener.originalUrl)
+    } else {
+      return res.render('index')}
     })
     .catch((err) => console.log(err))
-})
+})  
 
 
 module.exports = router
